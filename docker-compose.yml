@@ -1,0 +1,7 @@
+version: '3'
+services:
+  simple_db:
+    build: simple_db
+    volumes:
+      - ./simple_db:/go/simple_db
+    tty: true
