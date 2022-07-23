@@ -239,3 +239,12 @@ func TestMatchIntConstant(t *testing.T){
 		t.Errorf("tok.Ttype is not NUMBER")
 	}
 }
+
+func TestMatchStringConstant(t *testing.T){
+	var lexer = newLexer("'")
+	lexer.NextToken()
+
+	if !lexer.matchStringConstant(){
+		t.Errorf("tok.Ttype is not SINGLE_QUOTATION")
+	}
+}

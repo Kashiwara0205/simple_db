@@ -50,6 +50,7 @@ const (
 	AS = "as"
 	INDEX = "index"
 	ON = "on"
+	SINGLE_QUOTATION = "SINGLE_QUOTATION"
 )
 
 var keywords = map[string]TokenType {

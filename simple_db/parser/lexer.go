@@ -4,6 +4,11 @@ import (
 	"strings"
 )
 
+const (
+	NULL_NUMBER = 0
+	SINGLE_QUOTATION_NUMBER = 39
+)
+
 type lexer struct{
 	input string
 	position int
@@ -28,6 +33,10 @@ func (l *lexer) matchIntConstant() bool{
 	return NUMBER == l.tok.Ttype()
 }
 
+func (l *lexer) matchStringConstant() bool {
+	return SINGLE_QUOTATION == l.tok.Ttype()
+}
+
 func (l *lexer) readChar() {
 	if l.readPosition >= len(l.input) {
 		l.ch = 0
@@ -49,8 +58,10 @@ func (l *lexer) NextToken(){
 	l.skipWhitespace()
 
 	switch l.ch{
-	case 0:
+	case NULL_NUMBER:
 		l.tok = newToken(EOF, "")
+	case SINGLE_QUOTATION_NUMBER:
+		l.tok = newToken(SINGLE_QUOTATION, string(l.ch))
 	default:
 		if isLetter(l.ch){
 			l.tok = newToken(WORD, l.readWord())
