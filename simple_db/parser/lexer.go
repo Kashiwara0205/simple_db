@@ -7,7 +7,7 @@ type lexer struct{
 	ch byte
 }
 
-func NewLexer(input string) *lexer{
+func newLexer(input string) *lexer{
 	l := &lexer{input: input}
 
 	l.readChar()
@@ -23,4 +23,10 @@ func (l *lexer) readChar() {
 	}
 	l.position = l.readPosition
 	l.readPosition += 1
+}
+
+func (l *lexer) skipWhitespace(){
+	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r'{
+		l.readChar()
+	}
 }

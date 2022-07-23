@@ -3,7 +3,7 @@ package parser
 import "testing"
 
 func TestNewLexer(t *testing.T) {
-	lexer := NewLexer("select a1")
+	lexer := newLexer("select a1")
 
 	if lexer.input != "select a1" {
 		t.Errorf("lexer.input is not select a1")
@@ -23,7 +23,7 @@ func TestNewLexer(t *testing.T) {
 }
 
 func TestReadChar(t *testing.T) {
-	lexer := NewLexer("select")
+	lexer := newLexer("select")
 
 	if lexer.ch != 's' {
 		t.Errorf("lexer.ch is not s")

@@ -7,7 +7,7 @@ type token struct{
 	literal string
 }
 
-func NewToken(ttype TokenType, literal string) *token{
+func newToken(ttype TokenType, literal string) *token{
 	return &token{ttype: ttype, literal: literal}
 }
 
