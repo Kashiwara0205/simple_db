@@ -24,6 +24,10 @@ func (l *lexer) matchDelim(d TokenType) bool{
 	return d == l.tok.Ttype()
 }
 
+func (l *lexer) matchIntConstant() bool{
+	return NUMBER == l.tok.Ttype()
+}
+
 func (l *lexer) readChar() {
 	if l.readPosition >= len(l.input) {
 		l.ch = 0

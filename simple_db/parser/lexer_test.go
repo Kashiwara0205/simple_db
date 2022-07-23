@@ -230,3 +230,12 @@ func TestMatchDelim(t *testing.T){
 		t.Errorf("tok.Ttype is not NUMBER")
 	}
 }
+
+func TestMatchIntConstant(t *testing.T){
+	var lexer = newLexer("100")
+	lexer.NextToken()
+
+	if !lexer.matchIntConstant(){
+		t.Errorf("tok.Ttype is not NUMBER")
+	}
+}
