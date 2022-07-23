@@ -53,3 +53,37 @@ func TestReadChar(t *testing.T) {
 		t.Errorf("lexer.ch is not 0")
 	}
 }
+
+func TestSkipWhiteSpace(t *testing.T) {
+	var lexer = newLexer("a b")
+	lexer.readChar();
+	lexer.skipWhitespace();
+
+	if  lexer.ch != 'b'{
+		t.Errorf("lexer.ch is not b")
+	}
+
+	lexer = newLexer("a\nb")
+	lexer.readChar();
+	lexer.skipWhitespace();
+
+	if  lexer.ch != 'b'{
+		t.Errorf("lexer.ch is not b")
+	}
+
+	lexer = newLexer("a\tb")
+	lexer.readChar();
+	lexer.skipWhitespace();
+
+	if  lexer.ch != 'b'{
+		t.Errorf("lexer.ch is not b")
+	}
+
+	lexer = newLexer("a\rb")
+	lexer.readChar();
+	lexer.skipWhitespace();
+
+	if  lexer.ch != 'b'{
+		t.Errorf("lexer.ch is not b")
+	}
+}
