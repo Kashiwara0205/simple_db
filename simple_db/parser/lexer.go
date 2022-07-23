@@ -37,6 +37,14 @@ func (l *lexer) matchStringConstant() bool {
 	return SINGLE_QUOTATION == l.tok.Ttype()
 }
 
+func (l *lexer) matchKeyword(w string) bool{
+	return WORD == l.tok.Ttype() && l.tok.Literal() == w
+}
+
+func (l *lexer) matchID() bool{
+	return WORD == l.tok.Ttype() && !l.tok.IsKeyWord()
+}
+
 func (l *lexer) readChar() {
 	if l.readPosition >= len(l.input) {
 		l.ch = 0

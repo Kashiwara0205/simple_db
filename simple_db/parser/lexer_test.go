@@ -248,3 +248,28 @@ func TestMatchStringConstant(t *testing.T){
 		t.Errorf("tok.Ttype is not SINGLE_QUOTATION")
 	}
 }
+
+func TestMatchKeyWord(t *testing.T){
+	var lexer = newLexer("select")
+	lexer.NextToken()
+
+	if !lexer.matchKeyword("select"){
+		t.Errorf("do not match select")
+	}
+}
+
+func TestMatchID(t *testing.T){
+	var lexer = newLexer("select")
+	lexer.NextToken()
+
+	if lexer.matchID(){
+		t.Errorf("select is keyword, but mutch ID")
+	}
+
+	lexer = newLexer("hoge")
+	lexer.NextToken()
+
+	if !lexer.matchID(){
+		t.Errorf("hoge is not keyword, but do not mutch ID")
+	}
+}
