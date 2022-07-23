@@ -29,6 +29,7 @@ func (t *token)Literal()string{
 
 const (
 	EOF = "EOF"
+	ILLEGAL = "ILLEGAL"
 	NUMBER = "number"
 	WORD = "word"
 	SELECT = "select"

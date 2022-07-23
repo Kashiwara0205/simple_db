@@ -8,4 +8,5 @@ reboot:
 	docker-compose down
 	docker-compose up
 go_test:
+	docker exec -ti simple_db_simple_db_1 bash -c "go vet ./..."
 	docker exec -ti simple_db_simple_db_1 bash -c "go test -v ./..."
