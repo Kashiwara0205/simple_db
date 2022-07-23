@@ -23,7 +23,37 @@ func TestNewLexer(t *testing.T) {
 }
 
 func TestReadChar(t *testing.T) {
-	lexer := newLexer("select")
+	var lexer = newLexer("select")
+
+	if lexer.ch != 's' {
+		t.Errorf("lexer.ch is not s")
+	}
+
+	if lexer.readChar(); lexer.ch != 'e' {
+		t.Errorf("lexer.ch is not e")
+	}
+
+	if lexer.readChar(); lexer.ch != 'l' {
+		t.Errorf("lexer.ch is not l")
+	}
+
+	if lexer.readChar(); lexer.ch != 'e' {
+		t.Errorf("lexer.ch is not e")
+	}
+
+	if lexer.readChar(); lexer.ch != 'c' {
+		t.Errorf("lexer.ch is not c")
+	}
+
+	if lexer.readChar(); lexer.ch != 't' {
+		t.Errorf("lexer.ch is not t")
+	}
+
+	if lexer.readChar(); lexer.ch != 0 {
+		t.Errorf("lexer.ch is not 0")
+	}
+
+	lexer = newLexer("SELECT")
 
 	if lexer.ch != 's' {
 		t.Errorf("lexer.ch is not s")
@@ -144,43 +174,59 @@ func TestReadWord(t *testing.T){
 
 func TestNextToken(t *testing.T){
 	lexer := newLexer("select a1")
-	var tok = lexer.NextToken()
+	lexer.NextToken()
 
-	if tok.Literal() != "select"{
+	if lexer.tok.Literal() != "select"{
 		t.Errorf("tok.Literal is not select")
 	}
 
-	if tok.Ttype() != WORD{
+	if lexer.tok.Ttype() != WORD{
 		t.Errorf("tok.Ttype is not WORD")
 	}
 
-	tok = lexer.NextToken()
+	lexer.NextToken()
 
-	if tok.Literal() != "a"{
+	if lexer.tok.Literal() != "a"{
 		t.Errorf("tok.Literal is not a")
 	}
 
-	if tok.Ttype() != WORD{
+	if lexer.tok.Ttype() != WORD{
 		t.Errorf("tok.Ttype is not WORD")
 	}
 
-	tok = lexer.NextToken()
+	lexer.NextToken()
 
-	if tok.Literal() != "1"{
+	if lexer.tok.Literal() != "1"{
 		t.Errorf("tok.Literal is not 1")
 	}
 
-	if tok.Ttype() != NUMBER{
+	if lexer.tok.Ttype() != NUMBER{
 		t.Errorf("tok.Ttype is not NUMBER")
 	}
 
-	tok = lexer.NextToken()
+	lexer.NextToken()
 
-	if tok.Literal() != ""{
-		t.Errorf("tok.Literal is not %v", tok.Literal())
+	if lexer.tok.Literal() != ""{
+		t.Errorf("tok.Literal is not ''")
 	}
 
-	if tok.Ttype() != EOF{
+	if lexer.tok.Ttype() != EOF{
 		t.Errorf("tok.Ttype is not EOF")
+	}
+}
+
+func TestMatchDelim(t *testing.T){
+	var lexer = newLexer("select")
+	lexer.NextToken()
+
+	if !lexer.matchDelim(WORD){
+		t.Errorf("tok.Ttype is not WORD")
+	}
+
+	lexer = newLexer("100")
+	lexer.NextToken()
+
+	if !lexer.matchDelim(NUMBER){
+		t.Errorf("tok.Ttype is not NUMBER")
 	}
 }

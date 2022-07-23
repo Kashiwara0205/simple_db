@@ -1,18 +1,27 @@
 package parser
 
+import (
+	"strings"
+)
+
 type lexer struct{
 	input string
 	position int
 	readPosition int
 	ch byte
+	tok *token
 }
 
 func newLexer(input string) *lexer{
-	l := &lexer{input: input}
+	l := &lexer{input: strings.ToLower(input)}
 
 	l.readChar()
 
 	return l
+}
+
+func (l *lexer) matchDelim(d TokenType) bool{
+	return d == l.tok.Ttype()
 }
 
 func (l *lexer) readChar() {
@@ -31,25 +40,22 @@ func (l *lexer) skipWhitespace(){
 	}
 }
 
-func (l *lexer) NextToken() *token {
-	var tok *token
+func (l *lexer) NextToken(){
 
 	l.skipWhitespace()
 
 	switch l.ch{
 	case 0:
-		tok = newToken(EOF, "")
+		l.tok = newToken(EOF, "")
 	default:
 		if isLetter(l.ch){
-			tok = newToken(WORD, l.readWord())
+			l.tok = newToken(WORD, l.readWord())
 		}else if isDigit(l.ch){
-			tok = newToken(NUMBER, l.readNumber())
+			l.tok = newToken(NUMBER, l.readNumber())
 		}else{
-			tok = newToken(ILLEGAL, string(l.ch))
+			l.tok = newToken(ILLEGAL, string(l.ch))
 		}
 	}
-
-	return tok
 }
 
 func (l *lexer) readNumber() string {
