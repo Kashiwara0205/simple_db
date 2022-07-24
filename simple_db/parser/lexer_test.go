@@ -1,6 +1,8 @@
 package parser
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestNewLexer(t *testing.T) {
 	lexer := newLexer("select a1")
@@ -10,15 +12,15 @@ func TestNewLexer(t *testing.T) {
 	}
 
 	if lexer.position != 0 {
-		t.Errorf("lexer.position is not 0")
+		t.Errorf("lexer.position is %v", lexer.position)
 	}
 
 	if lexer.readPosition != 1 {
-		t.Errorf("lexer.readPosition is not 1")
+		t.Errorf("lexer.readPosition is %v", lexer.readPosition)
 	}
 
 	if lexer.ch != 's' {
-		t.Errorf("lexer.ch is not s")
+		t.Errorf("lexer.ch is %v", lexer.ch)
 	}
 }
 
@@ -174,7 +176,7 @@ func TestReadWord(t *testing.T){
 
 func TestNextToken(t *testing.T){
 	lexer := newLexer("select a1")
-	lexer.NextToken()
+	lexer.nextToken()
 
 	if lexer.tok.Literal() != "select"{
 		t.Errorf("tok.Literal is not select")
@@ -184,7 +186,7 @@ func TestNextToken(t *testing.T){
 		t.Errorf("tok.Ttype is not WORD")
 	}
 
-	lexer.NextToken()
+	lexer.nextToken()
 
 	if lexer.tok.Literal() != "a"{
 		t.Errorf("tok.Literal is not a")
@@ -194,7 +196,7 @@ func TestNextToken(t *testing.T){
 		t.Errorf("tok.Ttype is not WORD")
 	}
 
-	lexer.NextToken()
+	lexer.nextToken()
 
 	if lexer.tok.Literal() != "1"{
 		t.Errorf("tok.Literal is not 1")
@@ -204,7 +206,7 @@ func TestNextToken(t *testing.T){
 		t.Errorf("tok.Ttype is not NUMBER")
 	}
 
-	lexer.NextToken()
+	lexer.nextToken()
 
 	if lexer.tok.Literal() != ""{
 		t.Errorf("tok.Literal is not ''")
@@ -217,14 +219,14 @@ func TestNextToken(t *testing.T){
 
 func TestMatchDelim(t *testing.T){
 	var lexer = newLexer("select")
-	lexer.NextToken()
+	lexer.nextToken()
 
 	if !lexer.matchDelim(WORD){
 		t.Errorf("tok.Ttype is not WORD")
 	}
 
 	lexer = newLexer("100")
-	lexer.NextToken()
+	lexer.nextToken()
 
 	if !lexer.matchDelim(NUMBER){
 		t.Errorf("tok.Ttype is not NUMBER")
@@ -233,7 +235,7 @@ func TestMatchDelim(t *testing.T){
 
 func TestMatchIntConstant(t *testing.T){
 	var lexer = newLexer("100")
-	lexer.NextToken()
+	lexer.nextToken()
 
 	if !lexer.matchIntConstant(){
 		t.Errorf("tok.Ttype is not NUMBER")
@@ -242,7 +244,7 @@ func TestMatchIntConstant(t *testing.T){
 
 func TestMatchStringConstant(t *testing.T){
 	var lexer = newLexer("'")
-	lexer.NextToken()
+	lexer.nextToken()
 
 	if !lexer.matchStringConstant(){
 		t.Errorf("tok.Ttype is not SINGLE_QUOTATION")
@@ -251,7 +253,7 @@ func TestMatchStringConstant(t *testing.T){
 
 func TestMatchKeyWord(t *testing.T){
 	var lexer = newLexer("select")
-	lexer.NextToken()
+	lexer.nextToken()
 
 	if !lexer.matchKeyword("select"){
 		t.Errorf("do not match select")
@@ -260,16 +262,121 @@ func TestMatchKeyWord(t *testing.T){
 
 func TestMatchID(t *testing.T){
 	var lexer = newLexer("select")
-	lexer.NextToken()
+	lexer.nextToken()
 
 	if lexer.matchID(){
 		t.Errorf("select is keyword, but mutch ID")
 	}
 
 	lexer = newLexer("hoge")
-	lexer.NextToken()
+	lexer.nextToken()
 
 	if !lexer.matchID(){
 		t.Errorf("hoge is not keyword, but do not mutch ID")
+	}
+}
+
+func TestEatDelim(t *testing.T){
+	var lexer = newLexer("select")
+	lexer.nextToken()
+
+	lexer.eatDelim(WORD)
+
+	if lexer.tok.Literal() != ""{
+		t.Errorf("tok.Literal is not ''")
+	}
+
+	if lexer.tok.Ttype() != EOF{
+		t.Errorf("tok.Ttype is not EOF")
+	}
+
+	lexer = newLexer("select")
+	lexer.nextToken()
+
+	err := lexer.eatDelim(NUMBER)
+
+	if "BadSyntaxException" != err.Error() {
+		t.Errorf("occur other error")
+	}
+}
+
+func TestEatIntCostant(t *testing.T){
+	var lexer = newLexer("100")
+	lexer.nextToken()
+
+	result, _ := lexer.eatIntConstant()
+
+	if result != 100{
+		t.Errorf("eatIntConstant return value is %v", result)
+	}
+
+	lexer = newLexer("xxx")
+	lexer.nextToken()
+
+	_, err := lexer.eatIntConstant()
+
+	if "BadSyntaxException" != err.Error() {
+		t.Errorf("occur other error")
+	}
+}
+
+func TestEatStringConstant(t *testing.T){
+	var lexer = newLexer("'")
+	lexer.nextToken()
+
+	result, _ := lexer.eatStringConstant()
+
+	if result != "'"{
+		t.Errorf("eatStringConstant return value is %v", result)
+	}
+
+	lexer = newLexer("xxx")
+	lexer.nextToken()
+
+	_, err := lexer.eatStringConstant()
+
+	if "BadSyntaxException" != err.Error() {
+		t.Errorf("occur other error")
+	}
+}
+
+func TestEatKeyword(t *testing.T){
+	var lexer = newLexer("select a1")
+	lexer.nextToken()
+	lexer.eatKeyword("select")
+
+	if lexer.tok.Literal() != "a"{
+		t.Errorf("tok.Literal is %v", lexer.tok.Literal())
+	}
+
+	if lexer.tok.Ttype() != WORD{
+		t.Errorf("tok.Ttype is not %v", lexer.tok.Ttype())
+	}
+
+	lexer = newLexer("select")
+	lexer.nextToken()
+
+	err := lexer.eatKeyword("xxx")
+
+	if "BadSyntaxException" != err.Error() {
+		t.Errorf("occur other error")
+	}
+}
+
+func TestEatID(t *testing.T){
+	var lexer = newLexer("hoge a1")
+	lexer.nextToken()
+	result, _ := lexer.eatID()
+
+	if result != "hoge"{
+		t.Errorf("lexer.eatID() return value is %v", result)
+	}
+
+	lexer = newLexer("select")
+	lexer.nextToken()
+	_, err := lexer.eatID()
+
+	if "BadSyntaxException" != err.Error() {
+		t.Errorf("occur other error")
 	}
 }

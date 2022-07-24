@@ -2,6 +2,9 @@ package parser
 
 import (
 	"strings"
+	"github.com/pkg/errors"
+	"fmt"
+	"strconv"
 )
 
 const (
@@ -45,6 +48,59 @@ func (l *lexer) matchID() bool{
 	return WORD == l.tok.Ttype() && !l.tok.IsKeyWord()
 }
 
+func (l *lexer) eatDelim(d TokenType) (error){
+	if !l.matchDelim(d){
+		return errors.New(fmt.Sprintf("BadSyntaxException"))
+	}
+
+	l.nextToken();
+
+	return nil
+}
+
+func (l *lexer) eatIntConstant() (int, error){
+	if !l.matchIntConstant(){
+		return 0, errors.New(fmt.Sprintf("BadSyntaxException"))
+	}
+
+	literal := l.tok.Literal()
+	i, _ := strconv.Atoi(literal)
+	l.nextToken();
+
+	return  i, nil
+}
+
+func (l *lexer) eatStringConstant() (string, error){
+	if !l.matchStringConstant(){
+		return "", errors.New(fmt.Sprintf("BadSyntaxException"))
+	}
+
+	literal := l.tok.Literal()
+	l.nextToken();
+
+	return literal, nil
+}
+
+func (l *lexer) eatKeyword(w string) error{
+	if (!l.matchKeyword(w)){
+		return errors.New(fmt.Sprintf("BadSyntaxException"))
+	}
+
+	l.nextToken();
+
+	return nil
+}
+
+func (l *lexer) eatID() (string, error){
+	if (!l.matchID()){
+		return "", errors.New(fmt.Sprintf("BadSyntaxException"))
+	}
+
+	literal := l.tok.Literal()
+	l.nextToken();
+	return literal, nil
+}
+
 func (l *lexer) readChar() {
 	if l.readPosition >= len(l.input) {
 		l.ch = 0
@@ -61,7 +117,7 @@ func (l *lexer) skipWhitespace(){
 	}
 }
 
-func (l *lexer) NextToken(){
+func (l *lexer) nextToken(){
 
 	l.skipWhitespace()
 
